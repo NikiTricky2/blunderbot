@@ -44,10 +44,10 @@ def get_worst_move(board, engine, t=10, tm=None, d=None):
 
 board = chess.Board()
 
-player_color = None
-while player_color not in ["b", "w"]:
-    player_color = input("Input player (b/w): ")
-    match player_color:
+player_color_inp = None
+while not player_color_inp in ["b", "w"]:
+    player_color_inp = input("Input player (b/w): ")
+    match player_color_inp:
         case "b":
             player_color = 0
         case "w":
