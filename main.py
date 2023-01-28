@@ -10,7 +10,7 @@ TIME = 10 # Time in seconds a move calculation should take
 TIME_PER_MOVE = None # Time per individual move calculation
 DEPTH = None # Depth at witch the engine should search at
 
-RENDER_BOARD = "board.svg" # Render a board after every move. Good for troubleshooting. Set to None or the path to the board to be rendered.
+RENDER_BOARD = None # Render a board after every move. Good for troubleshooting. Set to None or the path to the board to be rendered.
 
 def get_worst_move(board, engine, t=10, tm=None, d=None):
     moves = []
