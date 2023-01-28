@@ -3,7 +3,8 @@ import chess.engine
 import chess.pgn
 from tqdm import tqdm
 
-engine = chess.engine.SimpleEngine.popen_uci('/home/niki/Documents/Code/Python/blunderbot/stockfish-ubuntu-20.04-x86-64')
+PATH_TO_ENGINE= "/path/to/engine"
+engine = chess.engine.SimpleEngine.popen_uci(PATH_TO_ENGINE)
 
 # THIS GOVERNS HOW LONG A MOVE CALCULATION TAKES
 TIME = 10 # Time in seconds a move calculation should take
@@ -15,27 +16,33 @@ RENDER_BOARD = None # Render a board after every move. Good for troubleshooting.
 def get_worst_move(board, engine, t=10, tm=None, d=None):
     moves = []
     mate = [] # Store mate moves
+
     legal_moves = list(board.legal_moves)
+
+    # Create limits for each of the options
     if t:
         limit = chess.engine.Limit(time=t/len(legal_moves))
     elif tm:
         limit = chess.engine.Limit(time=tm)
     else:
         limit = chess.engine.Limit(depth=d)
+
     for el in tqdm(legal_moves):
 
         analisys = engine.analyse(board, limit)
         score = analisys.get("score")
 
-        score_pov = score.pov(board.turn)
+        score_pov = score.pov(board.turn) # Get the score for the current player
+
+        # Check if the move is mate
         if score_pov.score():
             move_score = score_pov.score()
             moves.append([el, move_score, analisys.get("depth"), 0])
-        elif score_pov.mate():
+        elif score_pov.mate(): # If so, append it into a ✨special✨ array
             move_score = abs(int(score_pov.mate()))
             mate.append([el, move_score, analisys.get("depth"), 1])
         else:
-            moves.append([el, 1e6, analisys.get("depth"), 0])
+            moves.append([el, 1e6, analisys.get("depth"), 0]) # Makes Stalemate highly undesirable
 
     if mate:
         mate = sorted(mate, key=lambda x: x[1])
@@ -45,6 +52,7 @@ def get_worst_move(board, engine, t=10, tm=None, d=None):
 
 board = chess.Board()
 
+# Failsafe so the gameloop doesn't go bezerk when a wrong color is inputed
 player_color_inp = None
 while not player_color_inp in ["b", "w"]:
     player_color_inp = input("Input player (b/w): ")
@@ -60,9 +68,10 @@ while not (board.is_checkmate() or board.is_stalemate()):
     if player_color == to_move:
         worst_move = get_worst_move(board, engine, t=TIME, tm=TIME_PER_MOVE, d=DEPTH)
         if worst_move[3]: # Check if a move is mate
-            print(f"Move: {board.lan(worst_move[0])} (Mate in {worst_move[1]}, Depth: {worst_move[2]})")
+            score_descriptor = "Mate in"
         else:
-            print(f"Move: {board.lan(worst_move[0])} (Score: {worst_move[1]}, Depth: {worst_move[2]})")
+            score_descriptor = "Score:"
+        print(f"Move: {board.lan(worst_move[0])} ({score_descriptor} {worst_move[1]}, Depth: {worst_move[2]})")
 
     if to_move:
         move = input("White move: ")
@@ -71,19 +80,17 @@ while not (board.is_checkmate() or board.is_stalemate()):
 
     if move == "undo":
         board.pop()
-        to_move = int(not to_move)
+        to_move = int(not to_move) # Toggle the move
         continue
 
     try:
         move = chess.Move.from_uci(move)
+
         if not (move in list(board.generate_legal_moves())):
-            raise NotImplementedError("Not a valid move")
+            print("Invalid move. FEN code:", board.fen())
+            continue
         board.push(move)
-    except NotImplementedError:
-        print("Invalid move. FEN code:", board.fen())
-        continue
     except Exception as e:
-        # raise e
         print("Invalid move (error code). FEN code:", board.fen())
         continue
 
@@ -91,7 +98,7 @@ while not (board.is_checkmate() or board.is_stalemate()):
         with open(RENDER_BOARD, "w") as f:
             f.write(chess.svg.board(board, fill=dict.fromkeys([move.from_square, move.to_square], "#30ed26aa")))
 
-    to_move = int(not to_move)
+    to_move = int(not to_move) # Toggle the move
 
 print("Game ended!")
 
