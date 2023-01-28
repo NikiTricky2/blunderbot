@@ -11,6 +11,20 @@ TIME = 10 # Time in seconds a move calculation should take
 TIME_PER_MOVE = None # Time per individual move calculation
 DEPTH = None # Depth at witch the engine should search at
 
+def checkList(lst):
+    ele = lst[0]
+    chk = True
+
+    # Comparing each element with first item
+    for item in lst:
+        if ele != item:
+            chk = False
+            break
+    return chk
+
+def column(matrix, i):
+    return [row[i] for row in matrix]
+
 def get_worst_move(board, engine, t=10, tm=None, d=None):
     moves = []
     mate = [] # Store mate moves
@@ -39,7 +53,13 @@ def get_worst_move(board, engine, t=10, tm=None, d=None):
     if mate:
         mate = sorted(mate, key=lambda x: x[1])
         return mate[-1]
+
+    if checkList(column(moves, 1)):
+        move = random.choice(moves)
+        move.append(moves)
+        return move
     moves = sorted(moves, key=lambda x: x[1])
+    moves[0].append(moves)
     return moves[0]
 
 board = chess.Board()
