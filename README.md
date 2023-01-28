@@ -1,5 +1,5 @@
 # Blunderbot
-You know how chess bots nowadays are too overpowered? Blunderbot allows you to expirience that power over theese machines again. 
+You know how chess bots nowadays are too overpowered? Blunderbot allows you to experience that power over these machines again. 
 1. Download *any* chess engine
 2. Set the path of the engine in `PATH_TO_ENGINE`
 3. Start the program
@@ -11,7 +11,7 @@ After you've set the engine path and run the program, you will be asked what col
 ## Advanced usage
 
 ### Undoing moves
-When you've made a mitsake, on the next move prompt, write `undo` and the board will be restored to its previous state.
+When you've made a mistake, on the next move prompt, write `undo` and the board will be restored to its previous state.
 
 ### Time control
 Move calculations taking too long? In the first couple lines of code you'll see some variables that you can change (with descriptions ofc). Make sure that all variables except one are set to `None`, otherwise it could cause undesirable results.
